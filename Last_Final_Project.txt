@@ -1,0 +1,120 @@
+//#define F_CPU 1000000UL
+/* This is a simple program to run Atmega8 microcontroller (2 motors, 2 ir_sensor, build_in Led, buzzer) using functional programming. 
+    This program can be used to avoid obstacle with its own intelligence. Each sensor can be tested one by one using function calling. */
+
+ //Preprocessor file
+#include <avr/io.h>
+#include<util/delay.h>
+
+// Function validation 
+void Motors (void);
+void Ir_Sensor(void);
+void Led (void);
+void Buzzer(void);
+
+//Main Function
+int main(void)
+{
+	DDRB = 0xFF; //output high in Pin B to control the board Led and buzzer
+	DDRC = 0b0000000; // input in Pin C
+	DDRD = 0xFF; // output Pins D high
+	
+
+	while (1)
+	{
+	/* If you want to run any function remove "//" sign highlighted below */
+		//Led();
+		//Ir_Sensor();
+		//Buzzer();
+		//Motors();
+		
+	}
+}
+
+// To run Led in the board
+void Led (void)
+{
+	PORTB = 0b00111100;
+	_delay_ms(2000);
+	PORTB = 0b00011100;
+	_delay_ms(2000);
+	PORTB = 0b00001100;
+	_delay_ms(2000);
+	PORTB = 0b00000100;
+	_delay_ms(2000);
+	PORTB = 0b00000000;
+	_delay_ms(2000);
+}
+
+// To run both ir sensors
+void Ir_Sensor (void)
+{
+	int Ir_Sensor11;
+	int Ir_Sensor22;
+
+	Ir_Sensor22 = PINC&0000001;
+	Ir_Sensor11 = PINC&0000010;
+
+	if (Ir_Sensor11 == 0000010  && Ir_Sensor22 == 0000001)
+	{
+		Led();
+	}
+	if (Ir_Sensor11 == 0000000 && Ir_Sensor22 == 0000001)
+	{
+		Led();
+	}
+	if (Ir_Sensor11 == 0000001  && Ir_Sensor22 == 0000000)
+	{
+		Led();
+	}
+	if (Ir_Sensor22 == 0000000 && Ir_Sensor22 == 0000000)
+	{
+		PORTB = 0b00000000;
+	}
+	
+	
+}
+
+// To run Buzzer in the board
+void Buzzer(void)
+{
+	DDRB=0XFF;
+	DDRD=0xFF;
+	PORTB = 0b00000011;
+	//PORTD=0b00000011;
+	_delay_ms(5000);
+	PORTB = 0b00111100;
+	_delay_ms(5000);
+}
+
+
+// To run the motors or to avoid obstacles
+void Motors(void)
+{
+	int Left_Motor = 0;
+	int Right_Motor = 0;
+	
+	Left_Motor = PINC&0b0000001;
+	Right_Motor = PINC&0b0000010;
+	if (Left_Motor == 0b0000001 && Right_Motor == 0b0000010)
+	{
+		
+		PORTB = 0b00000000;
+		_delay_ms(5000);
+		Buzzer();
+		
+	}
+	if(Left_Motor == 0b0000001 && Right_Motor == 0b0000000)
+	{
+		PORTB = 0b00001000;
+	}
+	if (Left_Motor == 0b0000000 && Right_Motor == 0b0000010)
+	{
+		PORTB=0b00100000;
+	}
+	if(Left_Motor == 0b00000000 && Right_Motor == 0b00000000)
+	{
+		PORTB=0b00101000;
+	}
+	
+}
